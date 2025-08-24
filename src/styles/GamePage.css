@@ -1,0 +1,481 @@
+/* =========================
+   GamePage.css  —  Cleaned
+   ========================= */
+
+/* Base page scaling (non-combat screens use this) */
+.page-bg { overflow-x: hidden; }
+.page-scale {
+  transform: scale(.8);
+  transform-origin: top left;
+  width: calc(100% / .8);        /* scaled content still fills width */
+  min-height: calc(100vh / .8);  /* scaled content fills height */
+}
+
+/* ------------------------
+   Game Page container
+   ------------------------ */
+.game-page {
+  max-width: 1100px;
+  width: min(1100px, 94vw);
+  margin: 0 auto;
+  padding: 12px 14px 14px;
+  color: #e9ecf4;
+}
+
+/* Legacy combat panels (kept for non-grid pages using them) */
+.combat-area {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.player-panel,
+.enemy-panel {
+  flex: 1;
+  padding: 14px 10px;
+  background: #2c3244;
+  border-radius: 14px;
+  min-width: 130px;
+  margin: 0 6px;
+}
+
+/* Hand tiles */
+.card-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Generic card styling (editor/menu cards, etc.) */
+.card {
+  background: #2c3244;
+  border: 2px solid #393e52;
+  border-radius: 13px;
+  padding: 16px 12px;
+  min-width: 95px;
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: border .2s, box-shadow .2s;
+  box-shadow: 0 1px 6px #0003;
+  font-size: 1rem;
+  font-family: inherit;
+}
+.card.selected {
+  border: 2.5px solid #d0ff00;
+  background: #263a54;
+  box-shadow: 0 2px 10px #4e6cb875;
+}
+
+/* Action buttons row */
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 18px 0;
+}
+.action-buttons button {
+  background: #4e6cb8;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.action-buttons button:disabled {
+  background: #3a4162;
+  color: #b9b9b9;
+  cursor: not-allowed;
+}
+
+/* Misc UI */
+.initiative-indicator { text-align: center; font-size: 1.08rem; margin-top: 18px; }
+
+/* Room card layout (non-combat screens) */
+.room {
+  max-width: 600px;
+  margin: 32px auto;
+  padding: 24px;
+  background: #232a36;
+  border-radius: 15px;
+  box-shadow: 0 2px 14px #0002;
+}
+
+/* ------------------------
+   Main Menu
+   ------------------------ */
+.main-menu {
+  max-width: 350px;
+  margin: 0 auto;
+  background: #232635;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #0002;
+  color: #fff;
+  padding: 32px 24px;
+  text-align: center;
+}
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
+}
+.menu-buttons button {
+  background: #4e6cb8;
+  color: #fff;
+  font-size: 1.08rem;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: background .2s;
+}
+.menu-buttons button:hover { background: #6887d6; }
+
+/* ------------------------
+   Card Editor
+   ------------------------ */
+.card-editor {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #21263a;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #0003;
+  color: #fff;
+  padding: 32px 24px 20px;
+}
+.card-form { display: flex; flex-direction: column; gap: 10px; }
+.card-editor input, .card-editor select {
+  padding: 10px; border-radius: 8px; border: none; font-size: 1rem;
+  background: #2c3244; color: #fff; outline: none;
+}
+.card-editor button {
+  background: #49b89d; color: #fff; font-size: 1rem; border: none;
+  border-radius: 8px; padding: 10px 0; cursor: pointer; margin-top: 6px;
+  transition: background .2s;
+}
+.card-editor button:hover { background: #70dcc6; }
+.card-editor-msg { color: #9ee2b6; margin: 8px 0; text-align: center; font-size: 1rem; }
+.deck-list { list-style: none; margin-top: 18px; padding-left: 0; }
+.deck-list li { margin-bottom: 8px; background: #232635; padding: 8px 12px; border-radius: 8px; font-size: 1rem; }
+
+/* ------------------------
+   Loot / Merchant / Event Rooms
+   ------------------------ */
+.event-room, .loot-room, .merchant-room { margin-top: 14px; padding-top: 8px; }
+
+/* ------------------------
+   Fullscreen combat page
+   (drops the card layout chrome and disables page scroll)
+   ------------------------ */
+.game-page.fullscreen {
+  max-width: 100vw;
+  width: 100%;
+  margin: 0;
+  padding: 0;                /* CombatLayout owns spacing */
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;          /* no internal scroll */
+}
+
+/* Hand tiles row in overlay: we manage spacing in the overlay itself */
+.game-page.fullscreen .card-hand {
+  margin: 0;
+  justify-content: flex-start;
+}
+
+/* Overlays (generic modal) */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.modal.card     { background: #1e1e24; border: 1px solid #444; border-radius: 10px; padding: 16px 20px; width: min(520px, 92vw); color: #eee; }
+.modal-actions  { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.primary        { background: #5a8cff; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
+.ghost          { background: transparent; color: #ddd; border: 1px solid #666; padding: 8px 12px; border-radius: 6px; }
+
+/* Simple list utility */
+.list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.list-item { background: #19191f; border: 1px solid #444; color: #eee; padding: 8px 10px; border-radius: 6px; }
+
+/* Room scaffolding used by VN/Merchant */
+.room-actions { margin-top: 16px; display: flex; gap: 8px; }
+.shop-list, .loot-list { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.shop-item, .loot-item { background: #19191f; border: 1px solid #444; padding: 10px; border-radius: 6px; }
+.merchant-layer { position: relative; height: 280px; margin-bottom: 10px; }
+.merchant-npc   { position: absolute; bottom: 0; left: 20px; height: 260px; object-fit: contain; }
+.merchant-frame { position: absolute; top: 10px; right: 10px; height: 260px; object-fit: contain; }
+.merchant-dialogue, .vn-dialog {
+  position: relative; background: rgba(0,0,0,.55); border: 1px solid #555;
+  padding: 10px; border-radius: 8px;
+}
+.vn-dialog { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(640px, 92vw); }
+.vn-meta { opacity: .7; font-size: 12px; margin-top: 6px; }
+.vn-character { position: absolute; bottom: 0; right: 40px; height: 320px; object-fit: contain; }
+
+/* ------------------------
+   Responsive tweaks
+   ------------------------ */
+@media (max-width: 600px) {
+  .main-menu, .card-editor, .room, .game-page {
+    padding: 10px 4px 4px;
+    max-width: 98vw;
+  }
+  .menu-buttons { gap: 8px; }
+  .card-hand { justify-content: center; flex-direction: column; gap: 12px; align-items: center; }
+}
+
+/* ------------------------
+   Editors layout (EE)
+   ------------------------ */
+.ee-list{
+  width: 360px; min-width: 360px; max-width: 360px;
+  box-sizing: border-box; overflow: auto;
+}
+.ee-list .name{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ee-list input{ width: 100%; }
+
+.ee-wrap{ grid-template-columns: minmax(0, 1fr) 360px !important; column-gap: 24px !important; align-items: start; }
+.ee-form{
+  min-width: 0;
+  padding-right: calc(20px + 8px);
+  overflow: hidden;
+}
+.ee-form .row{ padding-right: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ee-form .row > *{ min-width: 0; }
+
+@media (max-width: 1280px){
+  .ee-list{ width: 320px; min-width: 320px; max-width: 320px; }
+  .ee-wrap{ grid-template-columns: minmax(0,1fr) 320px !important; column-gap: 20px !important; }
+}
+@media (max-width: 980px){
+  .ee-list{ width: auto; min-width: 0; max-width: none; }
+  .ee-wrap{ grid-template-columns: 1fr !important; }
+}
+
+/* Campaign editor specific (scoped with :has to avoid IDs) */
+div:has(> .ee-form .tabs) {
+  display: grid; /* ensure grid */
+  grid-template-columns: minmax(0,1fr) 360px !important;
+  column-gap: 24px;
+  align-items: stretch !important; /* both columns equal height */
+}
+div:has(> .ee-form .tabs) > .ee-list{
+  width: 360px; min-width: 360px; max-width: 360px;
+  align-self: stretch;
+  display: flex; flex-direction: column;
+  overflow: auto; box-sizing: border-box;
+}
+div:has(> .ee-form .tabs) > .ee-list input{ width: 100%; }
+div:has(> .ee-form .tabs) > .ee-list .list{ flex: 1 1 auto; min-height: 0; overflow: auto; }
+
+/* ------------------------
+   Combat-only refinements
+   ------------------------ */
+
+/* 1) Disable scaling & lock the combat viewport height */
+.page-scale.no-scale {
+  transform: none;
+  width: 100%;
+  height: 100dvh;      /* robust vs. browser UI bars */
+  min-height: 100dvh;
+  overflow: hidden;    /* no internal scroll in the page wrapper */
+}
+
+/* 2) Hand tray button sits fully inside the viewport */
+.right-rail { right: 16px !important; }
+
+/* 3) Keep the hand overlay on a single row; scroll horizontally if needed */
+.hand-overlay .card-hand {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 6px; /* room for OS scrollbar, if shown */
+}
+
+/* 4) Kill vertical page scrolling while combat is mounted (other pages unaffected) */
+html, body { height: 100%; margin: 0; } /* safety baseline */
+body:has(.game-page.fullscreen .combat-layout) { overflow-y: hidden !important; }
+/* === LootRoom: make CardTile fill its list item neatly === */
+
+/* Give the list item a 2-column grid: card | actions */
+.loot-room .loot-list { display: grid; gap: 10px; padding: 0; margin: 12px 0; list-style: none; }
+.loot-room .loot-item {
+  display: grid;
+  grid-template-columns: minmax(220px, 520px) auto; /* card column grows, actions auto */
+  column-gap: 14px;
+  align-items: start;
+  background: #19191f;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  overflow: visible; /* allow tile shadow */
+}
+
+/* Let the card occupy the entire first column */
+.loot-room .loot-card { width: 100%; }
+
+/* Override CardTile's fixed hand size ONLY inside LootRoom */
+.loot-room .loot-card .card-tile.hand {
+  width: 100% !important;
+  height: auto !important;            /* allow height to flow with content */
+}
+
+/* The tile body should also flow */
+.loot-room .loot-card .card-tile .ct-body { height: auto; }
+
+/* Keep the image nicely proportional to width */
+.loot-room .loot-card .ct-image {
+  aspect-ratio: 7 / 10;               /* consistent card aspect */
+  min-height: 0;                       /* cancel the min-height so it scales */
+}
+
+/* Optional: let the desc strip wrap to 2 lines instead of fixed 40px */
+.loot-room .loot-card .ct-desc {
+  height: auto;
+  max-height: 2.6em;                   /* ≈ two lines */
+  white-space: normal;
+  overflow: hidden;
+}
+
+/* Actions block styling (already present, just ensuring align) */
+.loot-room .loot-actions { display: inline-flex; gap: 8px; align-items: flex-start; }
+
+/* Mobile: stack card over actions for full width card preview */
+@media (max-width: 640px) {
+  .loot-room .loot-item { grid-template-columns: 1fr; row-gap: 10px; }
+  .loot-room .loot-actions { justify-self: start; }
+}
+/* Override EventRoom character styling */
+.event-room .vn-character {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+/* Tweak modal placement in EventRoom */
+.event-room .modal-overlay {
+  align-items: flex-start;
+  padding-top: 40vh; /* push it down toward vertical center */
+}
+.event-room .vn-dialog {
+  bottom: 10vh; /* match modal push */
+}
+.event-room .vn-character {
+  position: absolute;
+  top: 20vh;  /* match modal push */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.event-room {
+  min-height: 98vh;
+  background-position: center;
+  min-width: 220vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+/* Move 'Continue' button to bottom center of screen */
+.event-room .room-actions {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; /* stays above background */
+}
+/* LootRoom: smaller preview (like on-field mini) + tidy frame */
+.loot-room .loot-item {
+  grid-template-columns: minmax(160px, 220px) auto; /* narrower first column */
+}
+
+.loot-room .loot-card {
+  display: flex;
+  justify-content: center;
+}
+
+.loot-room .tile-frame {
+  background: #10131e;
+  border: 1px solid #2a3248;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.25);
+}
+
+/* If any previous LootRoom rules tried to stretch hand-sized tiles, neutralize them */
+.loot-room .loot-card .card-tile.hand {
+  width: auto !important;
+  height: auto !important;
+}
+/* --- LootRoom: fix vertical stretch & lock a true mini size --- */
+
+/* Don't let the preview column force the card to fill 100% height/width */
+.loot-room .loot-card { width: auto !important; }
+
+/* A neat frame that also constrains the card's max size */
+.loot-room .tile-frame {
+  background: #10131e;
+  border: 1px solid #2a3248;
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.25);
+  width: 180px;                 /* <= target mini width */
+  max-width: 180px;
+}
+
+/* Force the CardTile itself to honor the mini footprint */
+.loot-room .tile-frame .card-tile {
+  width: 164px !important;      /* inside the frame padding */
+  height: auto !important;      /* kill any fixed/tall heights */
+}
+
+/* Make internal sections flow naturally, preserving aspect ratio */
+.loot-room .tile-frame .card-tile .ct-body { height: auto !important; }
+.loot-room .tile-frame .card-tile .ct-image {
+  width: 100%;
+  height: auto;                 /* no vertical stretching */
+  aspect-ratio: 7 / 10;         /* card-like ratio */
+  object-fit: cover;
+  min-height: 0;
+}
+
+/* Narrow the first column a bit so the layout doesn't fight the mini size */
+.loot-room .loot-item {
+  grid-template-columns: 200px auto; /* mini card column | actions/info */
+}
+/* LootRoom: fixed-size box with scroll + fixed-height rows */
+.loot-room .loot-scroll {
+  height: 480px;              /* fixed box height (tweak as you like) */
+  overflow-y: auto;           /* scroll inside the box, not the page */
+  padding-right: 6px;         /* room for OS scrollbar */
+}
+
+/* Each list item is one fixed-height row */
+.loot-room .loot-item {
+  height: 200px;              /* fixed row size */
+  min-height: 200px;
+  align-items: center;        /* vertically center content in the row */
+  overflow: hidden;           /* clip any tall content */
+}
+
+/* Keep the mini card nicely sized inside the row */
+.loot-room .tile-frame { width: 180px; max-width: 180px; }
+.loot-room .tile-frame .card-tile { width: 164px !important; height: auto !important; }
+.loot-room .tile-frame .card-tile .ct-body { height: auto !important; }
+.loot-room .tile-frame .card-tile .ct-image {
+  width: 100%; height: auto; aspect-ratio: 7 / 10; object-fit: cover; min-height: 0;
+}
+
+/* Optional: on short screens, let the box size adapt a bit */
+@media (max-height: 800px) {
+  .loot-room .loot-scroll { height: 60vh; }
+}

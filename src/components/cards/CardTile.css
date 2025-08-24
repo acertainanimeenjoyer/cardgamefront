@@ -1,0 +1,202 @@
+/* Base sizes (can be tweaked) */
+:root {
+  --ct-hand-w: 168px;  /* was 176 */
+  --ct-hand-h: 256px;  /* was 268 */
+  --ct-mini-w: 92px;   /* fits 4 across with gaps on field */
+  --ct-mini-h: 138px;
+}
+
+.card-tile {
+  position: relative;
+  overflow: visible;
+  z-index: 0;  
+  user-select: none;
+}
+.card-tile.hand { width: var(--ct-hand-w); height: var(--ct-hand-h); }
+.card-tile.mini { width: var(--ct-mini-w); height: var(--ct-mini-h); }
+.card-tile:hover,
+.card-tile.is-selected { z-index: 5; }
+
+/* Clickable body */
+.card-tile .ct-body {
+  width: 100%; height: 100%;
+  padding: 8px;
+  background: #0f1524;
+  border: 1px solid #2e3a58;
+  border-radius: 12px;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto; /* head | image | desc | footer */
+  gap: 6px;
+  color: #dbe3f0;
+  cursor: pointer;
+  overflow: hidden;
+}
+.card-tile.mini .ct-body {
+  grid-template-rows: auto 1fr auto;      /* head | image | footer */
+}
+.card-tile.is-selected .ct-body { box-shadow: 0 0 0 2px #6aa1ff inset; }
+.card-tile.is-disabled .ct-body { opacity: .6; cursor: not-allowed; }
+
+/* Header */
+.ct-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* rarity | name | type */
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+.ct-rarity {
+  background: #22305a;
+  border: 1px solid #3a4162;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.ct-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+  padding: 2px 4px;
+  line-height: 1.1;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.ct-typecode { opacity: .85; font-weight: 600; }
+
+/* Image box */
+.ct-image {
+  background: #111827;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 1px solid #2f3a56;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+.card-tile.hand .ct-image { min-height: 120px; }
+.card-tile.mini .ct-image { min-height: 72px; }
+.ct-img-ph { font-size: 12px; color: #64748b; }
+
+/* Desc strip (hand only) */
+.ct-desc {
+  height: 40px;
+  background: rgba(255,255,255,.06);
+  color: #d1d7e5;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Footer */
+.ct-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.ct-stats-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.ct-info-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #4d5584;
+  background: #22305a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 9px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ct-info-btn {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #4d5584;
+  background: #22305a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ct-at-label {
+  font-weight: 700;
+  color: #a3b1d3;
+}
+.ct-at-value { color: #e8efff; }
+.ct-flex { min-width: 0; }
+.ct-ad { font-weight: 700; }
+
+.ct-stats {
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid #3a4162;
+  background: #111827;
+  font-weight: 700;
+  color: #e8efff;
+  white-space: nowrap;
+}
+
+/* Floating popover with abilities/stats */
+.ct-popover {
+  position: absolute; right: -8px; top: 50%; transform: translate(100%, -50%);
+  width: 260px; max-height: 70vh; overflow: auto;
+  background: #0c1022f0; border: 1px solid #3a4162; border-radius: 12px; padding: 12px; z-index: 50;
+  box-shadow: 0 8px 32px #000a;
+}
+.ctp-title { font-weight: 800; margin-bottom: 6px; }
+.ctp-row { font-size: 12px; opacity: .95; margin-bottom: 2px; }
+.ctp-block { margin-top: 8px; }
+.ctp-block-title { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+.ctp-list { margin: 0; padding-left: 16px; }
+
+/* Tiny tweak for mini to keep spacing tight */
+.card-tile.mini .ct-footer { font-size: 11px; }
+
+/* Ensure the art is confined to the image box and clipped to the radius */
+.ct-image {
+  position: relative;     /* keep stacking sane */
+  overflow: hidden;       /* hide anything outside the box */
+}
+
+/* Make the art fill the box (like object-fit: cover) */
+.ct-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;         /* no baseline gap */
+}

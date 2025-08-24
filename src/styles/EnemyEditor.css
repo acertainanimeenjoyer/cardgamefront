@@ -1,0 +1,101 @@
+.ee-wrap {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  padding: 24px;
+}
+
+.ee-form {
+  background: #0d1117;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 20px;
+  color: #e5e7eb;
+}
+
+.ee-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
+.ee-actions button { margin-left: 8px; }
+
+.ee-section { border-top: 1px solid #1f2937; padding-top: 18px; margin-top: 18px; }
+.ee-section h3 { margin: 0 0 8px; }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.full { grid-column: 1 / -1; }
+
+label { display:flex; flex-direction:column; gap:6px; font-size:14px; }
+input, select, textarea {
+  background:#0b1220; border:1px solid #1f2937; color:#d1d5db; border-radius:8px; padding:10px;
+}
+input:focus, select:focus, textarea:focus { border-color:#2563eb; }
+.primary { background:#2563eb; color:#fff; border:0; padding:10px 14px; border-radius:8px; }
+.ghost { background:transparent; color:#9ca3af; border:1px solid #334155; padding:8px 12px; border-radius:8px; }
+.danger { background:#b91c1c; color:#fff; border:0; padding:6px 10px; border-radius:8px; }
+.help { color:#9ca3af; display:block; margin-top:4px; }
+
+.ee-cardlist {
+  border:1px solid #1f2937; border-radius:8px; max-height: 320px; overflow:auto; background:#0b1220;
+}
+.ee-cardlist .list-item {
+  width:100%; display:flex; justify-content:space-between; padding:8px 10px;
+  color:#d1d5db; border-bottom:1px solid #111827; background:transparent;
+}
+.ee-cardlist .list-item:hover { background:#111827; }
+
+.ee-picked { border:1px solid #1f2937; border-radius:8px; padding:8px; min-height:120px; background:#0b1220; }
+.picked-row { display:flex; align-items:center; justify-content:space-between; padding:4px 0; border-bottom:1px dashed #1f2937; }
+.picked-row:last-child { border-bottom:0; }
+.picked-row .name { font-weight:600; }
+.picked-row .rowbtns button { margin-left:6px; }
+
+.ee-subsection { margin-top:16px; }
+.rowhead { display:flex; justify-content:space-between; align-items:center; }
+.prio-row, .combo-row { display:grid; grid-template-columns: 1fr 120px auto; gap:8px; align-items:center; margin:8px 0; }
+.combo-row .combo-cards { display:flex; flex-wrap:wrap; gap:6px; grid-column:1 / -1; }
+.tag { display:inline-flex; align-items:center; gap:6px; background:#111827; border:1px solid #1f2937; padding:4px 8px; border-radius:999px; }
+.tag button { background:transparent; border:0; color:#9ca3af; cursor:pointer; }
+
+.ee-msg { margin-top:12px; padding:10px; background:#052e16; border:1px solid #14532d; color:#a7f3d0; border-radius:8px; }
+
+.ee-list { background:#0d1117; border:1px solid #1f2937; border-radius:10px; padding:16px; color:#e5e7eb; }
+.ee-list .list-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.ee-list ul { list-style:none; padding:0; margin:0; }
+.ee-list li { border-top:1px solid #1f2937; padding:8px 0; }
+.ee-list li:first-child { border-top:0; }
+.ee-list li.active { background:#0b1220; border-radius:8px; }
+.ee-list .row { display:flex; align-items:center; justify-content:space-between; width:100%; }
+.ee-list .row.right { justify-content:flex-end; gap:8px; }
+.ee-list .name { font-weight:600; }
+.ee-list .meta { color:#9ca3af; font-size:12px; }
+
+.img-placeholder { color:#6b7280; padding: 10px 0; }
+
+@media (max-width: 980px) {
+  .ee-wrap { grid-template-columns: 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .prio-row, .combo-row { grid-template-columns: 1fr; }
+}
+
+/* === EnemyEditor: make the right sidebar flex downwards === */
+.ee-wrap{
+  align-items: stretch !important;          /* both columns equal-height */
+}
+
+.ee-list{
+  align-self: stretch;                       /* fill the grid row height */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;                             /* allow flex child to shrink */
+}
+
+.ee-list .list-head{ flex: 0 0 auto; }       /* header keeps natural size */
+
+/* let the UL be the scroll area so the box doesn't grow the layout */
+.ee-list ul{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;                            /* internal scroll when long */
+}
+
+/* (optional) keep buttons from widening rows */
+.ee-list .row{ min-width: 0; }

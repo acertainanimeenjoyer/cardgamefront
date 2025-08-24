@@ -1,0 +1,488 @@
+/* =======================================================
+   CombatLayout.css — Cleaned & Consolidated
+   ======================================================= */
+
+/* ---- Sizing knobs ---- */
+:root {
+  --enemy-badge: 108px;
+  --player-badge: var(--enemy-badge);
+
+  --effects-width: 220px;
+
+  --slot-w: 96px;
+  --slot-h: 138px;
+  --col-gap: 14px;
+  --row-gap: 28px;              /* vertical gap between the two field rows */
+
+  --board-radius: 14px;
+
+  --fx-tab-inset: 18px;         /* how far we push rows inward from the screen edge */
+  --fx-flyout-gap: 10px;        /* spacing between tab and its flyout */
+}
+
+/* =======================================================
+   High-level layout
+   ======================================================= */
+
+.combat-layout {
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 24px);
+  padding-left: clamp(24px, 5vw, 56px);
+  padding-right: clamp(24px, 5vw, 56px);
+}
+
+/* Three stripes (enemies / board / party) */
+.top-row,
+.bottom-row {
+  display: grid;
+  gap: 14px;
+  align-items: start;
+}
+
+/* Default (for older screens if used) */
+.top-row    { grid-template-columns: 1.5fr var(--effects-width); }
+.bottom-row { grid-template-columns: var(--effects-width) 1fr; }
+
+/* Inline effects mode (what you use now) collapses the extra column */
+.top-row.has-inline-effects,
+.bottom-row.has-inline-effects { grid-template-columns: 1fr; }
+
+/* Balanced breathing room around board */
+.top-row    { margin-bottom: 10px; }
+.bottom-row { margin-top:    10px; }
+
+/* =======================================================
+   Board (middle)
+   ======================================================= */
+
+.board {
+  position: relative;
+  /* exactly two rows of slots + the inter-row gap + small buffer */
+  min-height: calc(var(--slot-h) * 2 + var(--row-gap) + 24px);
+  padding-block: 6px;
+  gap: 12px;
+  border-radius: var(--board-radius);
+}
+
+/* Pop-in/out animations for the played overlay */
+.played-overlay { animation: popIn 300ms ease-out; }
+@keyframes popIn {
+  from { transform: translateX(-50%) scale(.92); opacity: 0; }
+  to   { transform: translateX(-50%) scale(1);   opacity: 1; }
+}
+.played-overlay.fly-out { animation: flyOut 800ms ease-in forwards; }
+@keyframes flyOut {
+  to { transform: translateX(calc(50vw - 20px)) translateY(-10px) scale(.8); opacity: 0; }
+}
+
+/* =======================================================
+   Unified 2x4 field grid
+   ======================================================= */
+
+.field-table{
+  width: min(92%, 860px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto auto;   /* enemy row, player row */
+  row-gap: var(--row-gap);
+  justify-items: center;
+}
+
+.ft-row{
+  display: grid;
+  grid-template-columns: repeat(4, var(--slot-w));
+  column-gap: var(--col-gap);
+  justify-content: center;
+}
+
+.ft-cell{
+  width: var(--slot-w);
+  height: var(--slot-h);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: #0f1524;
+  border: 1px dashed #364160;
+}
+.ft-cell.has-card { background: transparent; border-color: transparent; }
+.ft-cell .slot-turns{
+  position: absolute;
+  bottom: 4px; left: 6px;
+  font-size: 11px; color:#9fb2ff;
+  background:#0f1524b3; border:1px solid #2f3a56;
+  padding: 1px 4px; border-radius: 6px;
+}
+
+/* =======================================================
+   Enemy / Player rows & badges
+   ======================================================= */
+
+.enemy-with-effects,
+.player-with-effects{
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-left: var(--fx-tab-inset);  /* tiny inward nudge so nothing clips */
+}
+
+/* CharacterBadge look’n’feel */
+.char-badge {
+  --size: var(--enemy-badge);
+  display: flex; gap: 10px; align-items: center;
+  padding: 8px 10px; border-radius: 12px;
+  background: #1c2233; border: 1px solid #3a4266;
+  box-shadow: 0 2px 8px #0003;
+  position: relative; overflow: visible;
+}
+.party-row  .char-badge { --size: var(--player-badge); }
+
+.char-badge .avatar {
+  width: var(--size); height: var(--size);
+  background-color: #111827;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 2px solid #2f3a56;
+  border-radius: 10px;                   /* square avatar */
+}
+.char-badge .info { display: grid; gap: 4px; }
+.char-badge .name { font-weight: 600; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.char-badge .mini-info {
+  margin-left: 6px; padding: 2px 6px; border-radius: 8px; border: 1px solid #3d4a6a;
+  background: #111827; color: #cbd5e1; cursor: pointer; font-size: 12px;
+}
+
+/* Badge popover (the “!”) */
+.badge-popover {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 260px;
+  max-width: 48vw;
+  background: #2a3146;
+  border: 1px solid #3d4867;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px #0007;
+  padding: 12px 14px;
+  z-index: 40;
+}
+
+/* =======================================================
+   Inline vertical “Effect” tabs + flyouts
+   ======================================================= */
+
+.fx-inline{
+  position: relative;              /* anchor for flyout */
+  display: flex; align-items: center;
+  /* sits to the RIGHT of enemy badges and to the LEFT of player badge (based on markup order) */
+}
+
+.fx-tab{
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  width: 26px;
+  padding: 4px 2px;
+  border-radius: 10px;
+  border: 1px solid #2e3a58;
+  background: #0f1524;
+  color: #cbd5e1;
+  box-shadow: 0 6px 20px #0007;
+  letter-spacing: .5px;
+  cursor: pointer;
+  user-select: none;
+}
+.fx-tab:hover { background: #111a2e; }
+.fx-tab.enemy  { height: var(--enemy-badge); }
+.fx-tab.player { height: var(--player-badge); }
+
+/* floating effects panel; overlaps everything and does NOT affect layout */
+.fx-flyout{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1400;
+  width: min(360px, 48vw);
+  max-height: 70vh;
+  overflow: auto;
+  background: #0f1524;
+  border: 1px solid #2e3a58;
+  border-radius: 12px;
+  box-shadow: 0 10px 32px #000a;
+  padding: 10px 12px;
+}
+
+/* Enemy tab is on the RIGHT of its row → open LEFT from the tab */
+.enemy-with-effects .fx-flyout { right: calc(100% + var(--fx-flyout-gap)); left: auto; }
+
+/* Player tab is on the LEFT of its row → open RIGHT from the tab */
+.player-with-effects .fx-flyout { left:  calc(100% + var(--fx-flyout-gap)); right: auto; }
+
+/* =======================================================
+   Floating Combat Log (left rail)
+   ======================================================= */
+
+.combat-log-float {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1300;
+  pointer-events: auto;
+}
+.combat-log-float,
+.combat-log-float .drawer-handle{
+  width: 36px; height: 120px;
+  border-radius: 10px;
+  background: #1f2533;
+  border: 1px solid #6a7390;
+  color: #c8d2ef;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+  cursor: pointer;
+}
+.combat-log-float .drawer-handle{
+  width: 36px; height: 180px;
+  display: grid; place-items: center;
+  background: #0f1524; border: 1px solid #2e3a58; color: #cbd5e1;
+  box-shadow: 0 6px 20px #0007;
+}
+.combat-log-float .drawer-handle .handle-stripes{
+  font-size: 22px; letter-spacing: 2px; transform: rotate(90deg);
+}
+.combat-log-float .drawer-panel{
+  position: fixed; left: calc(18px + 36px + 10px); top: 50vh; transform: translateY(-50%);
+  width: 360px; max-width: min(90vw, 360px); max-height: 70vh; overflow: auto; pointer-events: auto;
+  background: #0f1524; border: 1px solid #2e3a58; border-radius: 12px; box-shadow: 0 10px 32px #000a;
+}
+
+/* =======================================================
+   Responsive guardrails
+   ======================================================= */
+
+@media (max-width: 1200px) {
+  :root { --enemy-badge: 104px; --player-badge: var(--enemy-badge); --effects-width: 200px; }
+}
+
+@media (max-width: 980px) {
+  :root { --enemy-badge: 90px; --player-badge: var(--enemy-badge); }
+  .top-row, .bottom-row { grid-template-columns: 1fr; }
+}
+
+/* Tighter typography inside the Effects list */
+.fx-flyout h3,
+.fx-flyout .title { 
+  margin: 0 0 8px !important;
+  font-size: 14px !important;
+  font-weight: 600;
+}
+.fx-flyout ul { margin: 0; padding-left: 16px; }
+.fx-flyout li { margin: 4px 0; }
+/* === Restore the old Effects panel look inside the flyout === */
+
+/* Make the flyout itself just an invisible anchor */
+.fx-flyout {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Bring back the compact panel card inside the flyout */
+.fx-flyout .panel.small {
+  background: #0f1524 !important;
+  border: 1px solid #2e3a58 !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  box-shadow: none !important;
+}
+
+/* Title + list spacing like before */
+.fx-flyout .panel.small .panel-title { 
+  font-weight: 600; 
+  margin-bottom: 8px; 
+}
+.fx-flyout .fx-list { 
+  margin: 0; 
+  padding-left: 16px; 
+}
+/* === Stats ("!") popover: float outside the badge, not inside === */
+/* Make sure the badge can spill children outside its bounds */
+.char-badge { position: relative; overflow: visible; }
+
+/* Default badge-popover had top:-10/right:-10 — override per side */
+.enemy-with-effects .badge-popover,
+.player-with-effects .badge-popover {
+  position: absolute;
+  left: auto;
+  right: 0;              /* keep aligned to the right edge near the button */
+  width: 260px;
+  max-width: 48vw;
+  transform: none;       /* kill any prior translate */
+  z-index: 1400;         /* overlap everything (same z as fx-flyout) */
+}
+
+/* ENEMY: show BELOW the button/badge */
+.enemy-with-effects .badge-popover {
+  top: calc(100% + 10px);   /* under the badge */
+  bottom: auto;
+}
+
+/* PLAYER: show ABOVE the button/badge */
+.player-with-effects .badge-popover {
+  bottom: calc(100% + 10px); /* above the badge */
+  top: auto;
+}
+/* === Stats ("!") popover: float outside the badge, not inside === */
+/* Make sure the badge can spill children outside its bounds */
+.char-badge { position: relative; overflow: visible; }
+
+/* Default badge-popover had top:-10/right:-10 — override per side */
+.enemy-with-effects .badge-popover,
+.player-with-effects .badge-popover {
+  position: absolute;
+  left: auto;
+  right: 0;              /* keep aligned to the right edge near the button */
+  width: 260px;
+  max-width: 48vw;
+  transform: none;       /* kill any prior translate */
+  z-index: 1400;         /* overlap everything (same z as fx-flyout) */
+}
+
+/* ENEMY: show BELOW the button/badge */
+.enemy-with-effects .badge-popover {
+  top: calc(100% + 10px);   /* under the badge */
+  bottom: auto;
+}
+
+/* PLAYER: show ABOVE the button/badge */
+.player-with-effects .badge-popover {
+  bottom: calc(100% + 10px); /* above the badge */
+  top: auto;
+}
+/* === FINAL: Stats ("!") popover must float outside the badge === */
+.char-badge { position: relative; overflow: visible; }
+
+/* Enemy: open BELOW the badge (under the "!" button) */
+.enemy-with-effects .char-badge .badge-popover,
+.enemy-with-effects .char-badge .cbadge-details-floating {
+  position: absolute !important;
+  right: 0 !important;    /* align to button/badge edge */
+  left: auto !important;
+  top: calc(100% + 10px) !important;   /* below */
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 1400 !important;
+  width: min(360px, 48vw) !important;
+  max-height: 70vh !important;
+  overflow: auto !important;
+}
+
+/* Player: open ABOVE the badge (over the "!" button) */
+.player-with-effects .char-badge .badge-popover,
+.player-with-effects .char-badge .cbadge-details-floating {
+  position: absolute !important;
+  right: 0 !important;
+  left: auto !important;
+  bottom: calc(100% + 10px) !important; /* above */
+  top: auto !important;
+  transform: none !important;
+  z-index: 1400 !important;
+  width: min(360px, 48vw) !important;
+  max-height: 70vh !important;
+  overflow: auto !important;
+}
+/* =========================================================
+   FINAL: "!" stats = separate floating card (2 columns)
+   ========================================================= */
+
+/* 0) Make sure the badge can position children outside itself */
+.char-badge { position: relative; overflow: visible; }
+
+/* 1) Hide any INLINE stats nodes rendered inside the badge.
+      We only want the floating version visible. */
+.enemy-with-effects .char-badge > .bp-title,
+.enemy-with-effects .char-badge > .bp-stats,
+.player-with-effects .char-badge > .bp-title,
+.player-with-effects .char-badge > .bp-stats {
+  display: none !important;
+}
+
+/* 2) Position: Enemy BELOW, Player ABOVE (keeps prior behavior) */
+.enemy-with-effects .char-badge .cbadge-details-floating,
+.enemy-with-effects .char-badge .badge-popover {
+  position: absolute !important;
+  top: calc(100% + 10px) !important;   /* under badge */
+  bottom: auto !important;
+  right: 0 !important; left: auto !important;
+  transform: none !important;
+  z-index: 1400 !important;
+}
+
+.player-with-effects .char-badge .cbadge-details-floating,
+.player-with-effects .char-badge .badge-popover {
+  position: absolute !important;
+  bottom: calc(100% + 10px) !important; /* above badge */
+  top: auto !important;
+  right: 0 !important; left: auto !important;
+  transform: none !important;
+  z-index: 1400 !important;
+}
+
+/* 3) Make the floating panel a visible card */
+.cbadge-details-floating,
+.badge-popover {
+  width: min(520px, 60vw) !important;
+  max-height: 70vh !important;
+  overflow: auto !important;
+
+  background: #0f1524 !important;
+  border: 1px solid #2e3a58 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 32px #000a !important;
+  padding: 12px 14px !important;
+
+  /* Two-column layout */
+  display: grid !important;
+  grid-template-columns: 180px 1fr !important;
+  column-gap: 16px !important;
+  align-items: start !important;
+}
+
+/* 4) Map common child blocks to columns.
+      If present, avatar/name/summary go LEFT; stats go RIGHT. */
+.cbadge-details-floating .avatar,
+.badge-popover .avatar,
+.cbadge-details-floating .info,
+.badge-popover .info {
+  grid-column: 1 !important;
+}
+
+.cbadge-details-floating .bp-title,
+.badge-popover .bp-title,
+.cbadge-details-floating .bp-stats,
+.badge-popover .bp-stats {
+  grid-column: 2 !important;
+}
+
+/* Tighten typography inside the stat column */
+.cbadge-details-floating .bp-title,
+.badge-popover .bp-title {
+  margin: 0 0 8px !important;
+  font-weight: 600 !important;
+}
+
+.cbadge-details-floating .bp-stats > div,
+.badge-popover .bp-stats > div {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important; /* label | value */
+  gap: 6px !important;
+  padding: 2px 0 !important;
+  border-bottom: 1px dashed #3c4663 !important;
+}
+.cbadge-details-floating .bp-stats > div:last-child,
+.badge-popover .bp-stats > div:last-child {
+  border-bottom: 0 !important;
+}
