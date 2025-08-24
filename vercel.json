@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/api/(.*)", "dest": "https://cardgameback.onrender.com/api/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://cardgameback.onrender.com/api/:path*" }
   ]
 }
