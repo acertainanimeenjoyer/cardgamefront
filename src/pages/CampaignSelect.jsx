@@ -16,7 +16,7 @@ export default function CampaignSelect() {
   const [error, setError] = useState('');
   const [sort, setSort] = useState('none');   // 'none' | 'likes' | 'popularity'
   const navigate = useNavigate();
-
+  const [likedMap, setLikedMap] = useState({}); // { [campaignId]: true|false }
   // load all campaigns
   const loadAll = async () => {
     try {
@@ -68,15 +68,17 @@ export default function CampaignSelect() {
   const like = async (id) => {
     try {
       setLiking(id);
-      await fetch(`/api/campaigns/${id}/like`, {
+      const resp = await fetch(`/api/campaigns/${id}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
+      const data = await resp.json().catch(()=> ({}));
+      setLikedMap(m => ({ ...m, [id]: !!data.liked }));
       if (found?._id === id) {
         const fresh = await campaignApi.getCampaign(id, token);
         setFound(fresh);
       } else {
-        await loadMine();
+        await loadAll();
       }
     } catch {
       // ignore for now; could surface toast
@@ -137,6 +139,7 @@ export default function CampaignSelect() {
 
         <div style={{ maxHeight: '60vh', overflowY: 'auto', border:'1px solid #1f2937', borderRadius: 10 }}>
           {rows.map(c => {
+            const liked = likedMap[c._id] ?? !!c.liked;
             const thumb =
             (c.cover && typeof c.cover.data === 'string' && c.cover.data.trim())
               ? c.cover.data.trim()
@@ -176,7 +179,7 @@ export default function CampaignSelect() {
                 </div>
                 <div className="row" style={{ gap:8 }} onClick={(e)=>e.stopPropagation()}>
                   <button className="ghost" onClick={() => like(c._id)} disabled={liking === c._id}>
-                    {liking === c._id ? '♥ Liking…' : '♥ Like'}
+                    {liking === c._id ? (liked ? '♥ Removing…' : '♥ Liking…') : (liked ? '♥ Liked' : '♥ Like')}
                   </button>
                   <button className="primary" onClick={() => play(c._id)}>Play</button>
                 </div>
