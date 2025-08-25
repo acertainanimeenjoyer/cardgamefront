@@ -3,7 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import campaignApi from '../services/campaignService';
 import { AuthContext } from '../contexts/AuthContext';
 import '../styles/ModernGameUI.css';
-
+// Decode JWT payload safely to fetch email (no external libs)
+function getEmailFromToken(tok) {
+  try {
+    if (!tok) return undefined;
+    const base64 = tok.split('.')[1];
+    if (!base64) return undefined;
+    const json = JSON.parse(decodeURIComponent(atob(base64).split('').map(c => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join('')));
+    return (json?.email || json?.user?.email || '').toLowerCase().trim() || undefined;
+  } catch { return undefined; }
+}
 const DEFAULT_CAMPAIGN_ID = 'PLACEHOLDER_CAMPAIGN_ID'; // TODO: replace when you have the real ID
 
 export default function CampaignSelect() {
@@ -64,24 +75,49 @@ export default function CampaignSelect() {
   const clearSearch = () => { setFound(null); setQueryId(''); setError(''); };
   const play = (id) => navigate(`/continue?campaign=${encodeURIComponent(id)}`);
 
-  // real like endpoint; refresh UI after
+  // Toggle like (one user/email can like once). Live update & anti-spam.
   const like = async (id) => {
+    if (liking === id) return; // guard rapid double-clicks
+    const email = getEmailFromToken(token);
     try {
       setLiking(id);
+      // Optimistic UI update (flip heart & +/- 1 on count)
+      setLikedMap(m => ({ ...m, [id]: !m[id] }));
+      setCampaigns(list => list.map(c => {
+        if (c._id !== id) return c;
+        const currentlyLiked = likedMap[id] ?? !!c.liked;
+        const delta = currentlyLiked ? -1 : 1;
+        return { ...c, likes: Math.max(0, Number(c.likes || 0) + delta) };
+      }));
+      if (found?._id === id) {
+        setFound(f => {
+          if (!f) return f;
+          const currentlyLiked = likedMap[id] ?? !!f.liked;
+          const delta = currentlyLiked ? -1 : 1;
+          return { ...f, likes: Math.max(0, Number(f.likes || 0) + delta) };
+        });
+      }
+
+      // Call API; include email so backend can anchor toggling by email
       const resp = await fetch(`/api/campaigns/${id}/like`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
       });
-      const data = await resp.json().catch(()=> ({}));
+      if (!resp.ok) throw new Error('toggle failed');
+      const data = await resp.json().catch(() => ({})); // { liked, likes }
+
+      // Reconcile with server truth
       setLikedMap(m => ({ ...m, [id]: !!data.liked }));
-      if (found?._id === id) {
-        const fresh = await campaignApi.getCampaign(id, token);
-        setFound(fresh);
-      } else {
-        await loadAll();
-      }
+      setCampaigns(list => list.map(c => c._id === id ? { ...c, likes: Number(data.likes ?? c.likes ?? 0) } : c));
+      if (found?._id === id) setFound(f => f ? { ...f, likes: Number(data.likes ?? f.likes ?? 0) } : f);
     } catch {
-      // ignore for now; could surface toast
+      // Roll back optimistic flip on failure
+      setLikedMap(m => ({ ...m, [id]: !!m[id] })); // flip back
+      // optional: toast error
     } finally {
       setLiking(null);
     }
